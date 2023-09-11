@@ -1,0 +1,32 @@
+Description:  This template deploys a s3 bucket for multi environment
+Parameters:
+  EnvironmentType:
+    Description: An environment name that is prefixed to resource names
+    Type: String
+    Default: DEV
+    AllowedValues: [DEV,PROD]
+
+Mappings:
+  Environments:
+    DEV:
+      S3NAME: jaz-iac1-dev-bkt
+      ENVIRONMENT: Development
+    PROD:
+      S3NAME: jaz-iac1-prd-bkt
+      ENVIRONMENT: Production
+
+Resources:
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !FindInMap [Environments, !Ref EnvironmentType, S3NAME]
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: TRUE
+        BlockPublicPolicy: TRUE
+        IgnorePublicAcls: TRUE
+        RestrictPublicBuckets: TRUE
+      Tags:
+        - Key: Name
+          Value: !FindInMap [Environments, !Ref EnvironmentType, S3NAME]
+        - Key: Environment
+          Value: !FindInMap [Environments, !Ref EnvironmentType, ENVIRONMENT]
